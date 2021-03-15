@@ -7,7 +7,7 @@ const fs = require('fs'); // Node's native file system module.
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-for (const file of commandFiles) {
+for (const file of commandFiles) { // All files in commandFiles.
 	const command = require(`./commands/${file}`);
 
 	client.commands.set(command.name, command); // set a new item in the Collection
