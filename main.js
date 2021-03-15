@@ -1,7 +1,17 @@
-const discord = require("discord.js");
+const Discord = require("discord.js");
 const axios = require("axios");
-const client = new discord.Client();
+const client = new Discord.Client();
 const prefix = "!";
+const fs = require('fs'); // Node's native file system module.
+
+client.commands = new Discord.Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+
+	client.commands.set(command.name, command); // set a new item in the Collection
+}
 
 client.once("ready", () => {
     console.log("LjimeBot is online :)");
@@ -14,49 +24,13 @@ client.on("message", async message => {
     const args =  message.content.slice(prefix.length).split(/ +/); // Remove prefix part of string and split all args into an array
     const command = args.shift().toLowerCase(); // Shift removes first element of the array and then returns it. 
 
-    if(command == "shutdown") {
-        client.destroy();
-    } else if (command == "help") {
-        let helpEmbed = new discord.MessageEmbed()
-            .setColor("#0099ff")
-            .setTitle("List of Commands")
-            .setDescription("Here's all of the useless junk commands you'll ever need")
-            .addFields(
-                {name: "!Joke", value: "Sends a random joke", inline: false},
-                {name: "!Meme", value: "Sends a random WHOLESOME :) meme", inline: false}
-            );
-        message.channel.send(helpEmbed);
-    }
-
     if(command == "joke") {
-        axios.get("https://official-joke-api.appspot.com/random_joke")
-        .then((response) => { // Gets reponse from the GET call
-             console.log("RESPONSE:", response.data.setup);
-             message.channel.send(response.data.setup);
-             message.channel.send(response.data.punchline);
-        })
-        .catch((err) => { // catch error and logs it
-            console.log("ERROR:" , err)
-        });
+        client.commands.get("joke").execute(message, args);
     } else if(command == "meme") {
-        axios.get("https://meme-api.herokuapp.com/gimme/wholesomememes")
-        .then((response) => {
-            message.channel.send(response.data.url);
-        })
-        .catch((err) => {
-            console.log("Error:" , err)
-        });
-    } else if(command == "covid") {
-        axios.get("")
-        .then((response) => {
-            console.log(response);
-        })
-        .catch((err) => {
-            console.log(err);
-        })
+        client.commands.get("meme").execute(message, args);
+    } else if (command == "help") {
+        client.commands.get("help").execute(message, args);
     }
-
-
-})  
+}) 
 
 client.login("ODE5NzE5NzgyNDc0NTgwMDA4.YEqtiQ.EzSQF37xhyOn0kOMc7FFHPNE2Ck");
