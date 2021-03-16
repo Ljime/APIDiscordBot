@@ -30,6 +30,8 @@ client.on("message", async message => {
         client.commands.get("meme").execute(message, args);
     } else if (command == "help") {
         client.commands.get("help").execute(message, args);
+    } else if(command == "gif") {
+        client.commands.get("gif").execute(message, args);
     }
 }) 
 
